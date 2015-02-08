@@ -1,0 +1,428 @@
+\documentclass[11pt]{article}
+\usepackage{amssymb}
+\usepackage{amsmath,amscd,amsthm}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{pscyr}
+\usepackage{indentfirst}
+\usepackage{letltxmacro}
+\usepackage{mathtools}
+\usepackage{ulem}
+\usepackage{xcolor}
+%\thispagestyle{empty}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{comment}
+%\usepackage{times}
+\usepackage{tikz}
+\usepackage[all]{xy}
+\xyoption{tips}
+\SelectTips{lu}{10}
+ \usetikzlibrary{matrix,calc,arrows,shapes,snakes}
+
+\def\be{\numberwithin{equation}{section}\begin{eqnarray}}
+\def\ee{\end{eqnarray}}
+\def\trademark{{\hbox{\tiny TM}}}
+\def\dim{\textmd{dim} \hskip 3 pt}
+\def\p{\partial}
+\def\R{\Rightarrow}
+\def\ph{\varphi}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\theoremstyle{remark}
+\newtheorem{rem}[thm]{Remark}
+\theoremstyle{definition}
+\newtheorem{Def}[thm]{Definition}
+
+
+\newcommand{\que}[1]{\footnote{\textcolor[rgb]{0.38,0.69,0.82}{#1}}}
+
+\renewcommand\thefootnote{\textcolor[rgb]{0.38,0.69,0.82}{\arabic{footnote}}}
+
+
+\LetLtxMacro{\oldsqrt}{\sqrt} % makes all sqrts closed
+\renewcommand{\sqrt}[1][\ ]{%
+  \def\DHLindex{#1}\mathpalette\DHLhksqrt}
+\def\DHLhksqrt#1#2{%
+  \setbox0=\hbox{$#1\oldsqrt[\DHLindex]{#2\,}$}\dimen0=\ht0
+  \advance\dimen0-0.2\ht0
+  \setbox2=\hbox{\vrule height\ht0 depth -\dimen0}%
+  {\box0\lower0.71pt\box2}}
+
+%$\sqrt[a]{b} \quad \oldsqrt[a]{b}$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%               SPACE FILLING SETTINGS               %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\textheight 23.5cm \textwidth 16.3cm
+%\voffset=-1.2in
+\voffset=-0.8in
+%\voffset= - 1.85in
+\hoffset= - 1.0in         % switch off for draft style
+\multlinegap=1.0in
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\baselineskip14pt
+\bigskip
+
+
+\tableofcontents
+\bigskip
+\bigskip
+
+%======================================================
+
+А.С. нам рассказывает вещи, которые не должны быть утеряны. Каждый раз он рассказывает, каковой (по-видимому) на самом деле должна быть парадигма. Здесь будет записываться <<передний фронт разработки>>, как в программировании. (Таким образом, это не конспект нашего семинара.)
+
+Пожалуйста, \textbf{вносите изменения} в этот файл, \textbf{дополняйте} его. Пусть он станет вашим рабочим столом. Нет никакого другого способа что-то понять, чем попытаться изложить это листу бумаги/соседу/уточке в ванной. Но у изложения листу бумаги есть два дополнительных бонуса:
+\begin{itemize}
+  \item не пропадёт ваш скорбный труд и дум высокое стремленье
+  \item возможность конструктивного фидбека от $n$ слушателей семинара
+\end{itemize}
+
+\subsubsection{Как вносить изменения в файл}
+
+После некоторых размышлений я пришёл к выводу, что в качестве системы контроля версий мы будем использовать GitHub. 
+
+Если вы обнаруживаете, что чего-то не понимаете --- предлагаю задать вопрос сноской. Делается это с помощью синтаксиса $\backslash \text{que} \{ \text{почему?} \}$. Пример\que{почему?} заданного таким образом вопроса.
+
+Если вы обнаруживаете, что что-то понимаете --- просто берёте и редактируете текст.
+
+Если у вас не компилится этот tex-файл --- закомментируйте строку $\backslash\text{usepackage}\{ \text{pscyr} \}$ и попробуйте снова; пакет pscyr, содержащий красивые кириллические шрифты, не все себе устанавливали.
+
+\newpage
+
+
+
+
+\section{$A_{\infty}$-структуры, $\Delta_{BV}$-оператор, поливекторные поля}
+
+\subsection{Наша задача --- понять, что вместо вопроса}
+
+(Пока что наша задача --- великолепно переписать этот огрызок.)
+
+Есть нечётные векторные поля $v_{\text{н}}$: $$v_{\text{н}} \in \oplus_k V^{\otimes k} \to V.$$
+
+И главное уравнение $A_{\infty}$-структуры имеет вид: $v_{\text{н}}^2 = 0.$ Или $\{v,v\}_G = 0.$
+
+Но неправильно говорить просто об этом уравнении. Нужно ещё сфакторизовать по соотношению эквивалентности $v\sim v + \{v,w\}$ --- автоморфизмам этого векторного пространства.
+
+$$v = v_0 + Pol, \hskip 20 pt Pol \ll v_0.$$ Получится уравнение $\{ v_0, Pol \} + \{ Pol, Pol \} = 0.$
+
+Далее, можно сказать, что $Pol = P_0 + \omega$. Т.е. $v = v_0 + P_0 + \omega$. Именно $\omega$, этот чёртов третий член, даёт нам когомологии. Первые же два члена этого разложения определяют мир, который рассматривается.
+
+Стоит отметить, что $v_0: V^{\otimes 2} \to V$ --- обычное умножение. Поэтому его обычно обозначают $m_2$.
+
+Если мы работаем с кольцом $\mathbb{C}[x] \otimes \mathbb{C}[\lambda, \theta] / (\lambda \gamma \lambda)$ (пространственных переменных $x$ 10, чётных полей $\lambda$ 16, нечётных полей $\theta$ тоже 16), а в качестве $P_0$ мы берём $\lambda^{\alpha} \frac{\partial}{\partial \theta^{\alpha}}$, то получится $\mathcal{N} = 1$ $D=10$ SYM \que{интересно, какая из пяти?..}. Низкоэнергетическое приближение --- $D=10$ супергравитация.
+
+Получается такой коммутативный квадрат:
+
+%$$\xymatrix{ ? \ar@{.>}[r] \ar@{.>}[d] & \text{nearly comm.limit\que{что это?}} \ar[d] \\ \hbar\Delta_{BV} Pol+ \{Pol, Pol\} = 0 \ar[r] & \{Pol, Pol\} = 0}$$
+
+\begin{center}
+\begin{tikzpicture}[>=stealth',shorten >=1pt,auto,node distance=3cm,
+  thick,back line/.style={densely dotted},
+cross line/.style={preaction={draw=white, -,
+line width=6pt}},main node/.style={circle,fill=blue!20,draw,font=\sffamily\Large\bfseries}]
+
+\matrix (m) [matrix of math nodes,
+row sep=3em, column sep=3em,
+text height=1.5ex,
+text depth=0.25ex]{
+? &  & \text{nearly comm.limit} \\
+ & & \\
+\hbar\Delta_{BV} Pol+ \{Pol, Pol\} = 0 &  & \{Pol, Pol\} = 0 \\
+};
+
+% Сноску "что это?" из коммутативной диаграммы никак не поставишь --- я пытался. Поэтому так.
+
+\path[->]
+(m-1-1) edge [back line] (m-3-1)
+(m-1-1) edge [back line] (m-1-3)
+(m-3-1) edge [cross line] (m-3-3)
+(m-1-3) edge [cross line] (m-3-3);
+\end{tikzpicture}
+
+\end{center}
+
+И наша задача --- понять, что вместо вопроса.
+
+\subsection{Задача матричной факторизации}
+
+Точки на нашем пространстве модулей могут подъезжать к границе, и нужно предложить какое-то граничное условие. Граница является браной.
+
+Сама по себе задача матричной факторизации давно известна в теории особенностей и сводится к элементарному утверждению. Именно, нужно решить матричное уравнение на $N$ вида $W = N^2$. $W(x)$ --- суперпотенциал, $N$ --- матрица, которую необходимо найти.\que{Тема матриц не раскрыта} Высший смысл происходящего формулируется так: триангулированные категории особенностей слоёв отображения $W$ эквивалентны категориям В-бран.
+
+
+\begin{comment}
+\footnotesize{}
+
+Общеобразовательный кусок про деформации комплексных структур
+
+$$Q_{\tau} = Q + \tau V_1 + \tau^2 V_2, \bar \p_{\tau} = \bar\p + \tau \mu_1 \p + \tau^2 \mu_2 \p + ...$$
+
+Надо изучать комплексные структуры по модулю диффеоморфизмов. Оказывается, уравнение Кодаиры $$(\bar\p + \mu(\tau) \p)^2 =0$$ можно обобщить. А именно, можно деформировать не только дифференциал $\bar\p$, но и вообще всё что угодно.
+
+В топологической квантовой механике имеем уравнение $$H = \{Q(\tau), G\}.$$
+
+\normalsize{}
+
+\end{comment}
+
+
+\section{Новый взгляд на геометрию}
+\subsection{Собственно взгляд}
+
+Классическая геометрия является вырождением геометрии Полякова.
+
+\begin{center}
+
+
+\begin{comment}
+\begin{tikzpicture}[
+back line/.style={densely dotted},
+cross line/.style={preaction={draw=white, -,
+line width=6pt}}]
+\end{comment}
+
+\begin{tikzpicture}[>=stealth',shorten >=1pt,auto,node distance=3cm,
+  thick,back line/.style={densely dotted},
+cross line/.style={preaction={draw=white, -,
+line width=6pt}},main node/.style={circle,fill=blue!20,draw,font=\sffamily\Large\bfseries}]
+
+
+%\shade[shading=radial, inner color=blue]
+%(0,0) rectangle (2,1);
+
+ % \matrix[nodes={fill=blue!20},
+%       row sep=7em,column sep=3em,text height=1.5ex,
+% text depth=0.25ex] 
+%{
+%    \node[ellipse] {\text{яяя}}; \\};
+
+\matrix (m) [matrix of math nodes,
+row sep=3em, column sep=3em,
+text height=1.5ex,
+text depth=0.25ex]{
+& \text{Геометрия} & & \text{Физика} \\
+\text{гладкие мн-я} & & \text{классическая} \\
+& \text{алг. геом.} & & \text{квант. мех.} \\
+ & & & \textmd{некомм. геом.} \\
+  & \text{Поляков} & &  \\
+};
+
+\draw (m-2-1) edge [back line] node {\tiny{\text{Риччи-плоск.;\hskip 20 pt инстантоны}}} (m-2-3)
+(m-2-3) edge [back line] node {\tiny{\text{идеи Фейнмана}}} (m-3-4)
+(m-3-2) edge [back line] node {\tiny{\text{некомм. алгебра}}} (m-3-4);
+%(m-3-2) edge (m-4-1)
+%(m-3-4) edge (m-4-3)
+%(m-2-1) edge [back line] (m-4-1)
+
+%(m-2-3) edge [back line] (m-4-3)
+\path[->]
+(m-1-4) edge (m-3-4)
+(m-3-4) edge (m-4-4)
+(m-1-2) edge [cross line] (m-3-2)
+(m-2-3) edge [cross line] (m-5-2)
+(m-4-4) edge (m-5-2)
+(m-1-2) edge (m-2-1)
+(m-1-4) edge (m-2-3);
+%(m-4-1) edge (m-4-3)
+\end{tikzpicture}
+
+\end{center}
+
+
+
+Есть две точки зрения на то, что изучает геометрия:
+
+\begin{itemize}
+  \item пространство
+  \item пространство и какая-нибудь геометрическая структура на нём
+\end{itemize}
+
+Согласно Полякову, (гомотопическая) конформная теория --- это и есть пространство + геометрия на нём.
+
+\subsection{Напоминание о том, что такое конформная теория поля}
+
+Конформные теории поля --- теории поля, инвариантные относительно конформных преобразований метрики. В них есть <<основной объект>> $I$, зависящий от поверхности $\Sigma$ (вид поверхности зависит от того, открытая или замкнутая струна, а также от количества наблюдаемых $V_1$, ..., $V_n$ в рассматриваемом корреляторе). Метрик, сфакторизованных по соотношению эквивалентности <<конформно связанные метрики эквивалентны>>, столько же, сколько комплексных структур, поэтому основной объект $I$ зависит также от комплексной структуры (т.е. от дифференциала Бельтрами $\mu$, который параметризует модули комплексных структур на $\Sigma$). Комплексные структуры, очевидно, надо изучать по модулю диффеоморфизмов. Физический смысл нижеследующей картинки вот каков: для того, чтобы вычислить коррелятор операторов $V_1$, ..., $V_n$, нужно вырезать малые диски вокруг точек worldsheet'а и вычислять инварианты Громова---Виттена, являющиеся подсчётом композиций кобордизмов комплексно одномерных многообразий\que{я правильно понимаю, что основной объект $I(\Sigma, V_1, ..., V_n)$ и соответствующий ему инвариант Громова---Виттена --- это одно и то же?}.
+
+\begin{center}
+\begin{tikzpicture}
+
+%\fill[cyan!10] (-0.1,0.4) arc (-45:45:1cm and 1.55cm) arc (-95:40:0.166cm and 0.5cm) arc (-175:-5:2.0cm and 0.53cm) arc (140:275:0.166cm and 0.5cm) arc (135:225:1cm and 1.55cm) arc (85:220:0.166cm and 0.5cm) arc (5:175:2.0cm and 0.53cm) arc (-40:95:0.166cm and 0.5cm);
+
+\fill[cyan!10] (4,0) rectangle (0,3);
+
+\fill[cyan!10] (0.11,3.4) arc (-175:-5:1.9cm and 0.6cm) -- (3.89,2.45) -- (0.11,2.45) -- cycle;
+\fill[cyan!10] (3.89,-0.4) arc (5:175:1.9cm and 0.6cm) -- (0.11,0.55) -- (3.89,0.55) -- cycle;
+
+%	\draw[dashed,color=gray] (0,0) arc (-90:90:0.5 and 1.5);% right half of the left ellipse
+%	\draw[semithick] (0,0) -- (4,1);% bottom line
+%	\draw[semithick] (0,3) -- (4,2);% top line
+%	\draw[semithick] (0,0) arc (270:90:0.5 and 1.5);% left half of the left ellipse
+	\draw[thick,fill=white] (4,3) ellipse (0.166 and 0.5);% right top ellipse
+	\draw[thick,fill=white] (0,3) ellipse (0.166 and 0.5);% left top ellipse
+	\draw[thick,fill=white] (4,0) ellipse (0.166 and 0.5);% right bottom ellipse
+	\draw[thick,fill=white] (0,0) ellipse (0.166 and 0.5);% left bottom ellipse
+\draw[thick,fill=white] (-0.1,0.4) arc (-45:45:1cm and 1.55cm); % left arc
+\draw[thick,fill=white] (3.89,-0.4) arc (5:175:1.9cm and 0.6cm); % bottom arc
+\draw[thick,fill=white] (4.1,2.6) arc (135:225:1cm and 1.55cm); % right arc
+\draw[thick,fill=white] (0.11,3.4) arc (-175:-5:1.9cm and 0.6cm); % top arc
+
+  \draw (-0.5,0) node {\footnotesize $...$};
+  \draw (-0.5,3) node {\footnotesize $V_1$};
+  \draw (4.5,0) node {\footnotesize $V_n$};
+  \draw (4.5,3) node {\footnotesize $V_2$};
+  
+  \draw (0.75,1.5) node {\footnotesize $\Sigma_1$};
+    \draw (2.75,1.5) node {\footnotesize $\Sigma_2$};
+
+\draw[dashed,thick,color=gray] (1.5,1.5) ellipse (0.1cm and 1.37cm);
+
+
+%\filldraw[fill=cyan, draw=blue] (6,6) -- (12mm,0mm) arc (0:30:12mm) -- (6,6);
+\end{tikzpicture}
+\end{center}
+
+
+
+Т.е. вот где основной объект принимает значения: $$I (\Sigma, \mu) \in V_1 \otimes ... \otimes V_n \otimes \Big( \mu(\Sigma)/\text{diff} \Big)$$
+
+и при этом есть единственная аксиома: что если эту поверхность разрезать, то
+$$I(\Sigma, \mu) = I(\Sigma_1, \mu) \circ I(\Sigma_2, \mu).$$
+
+Тензор энергии-импульса же можно вытащить из такой теории вариацией основного объекта по дифференциалу Бельтрами:
+
+$$T = \frac{\delta I(\Sigma, \mu)}{\delta \mu}$$
+
+
+
+Польчинский пишет действие, которое мы назовём действием старой струнной геометрии: 
+
+$$S = \int g_{\mu\nu} (x) dx^{\mu} \ast dx^{\nu} + B_{\mu\nu}(x) dx^{\mu} \wedge dx^{\nu},$$
+
+второй член --- поле Калба---Рамона, 2-форма на таргете. Действие новой же струнной геометрии таково:
+
+
+\be  S = \int\limits_{\Sigma} \Bigg( P_i \bar \partial X^i + \bar P_{\bar i} \partial \bar X^{\bar i} + \tikz[baseline]{\draw[dashed,thick,color=gray] (-4.3,-0.25) rectangle (4.3,0.55);
+            \node[anchor=base] (t1)
+            {$g^{i \bar j} (x, \bar x) P_i P_{\bar j} +\mu^i_{\bar j} P_i \bar \partial \bar X^{\bar j} + \mu_j^{\bar i} P_{\bar i} \partial X^j +  b_{i \bar j} \partial X^i \bar\partial \bar X^{\bar j}$};}  \Bigg). \ee
+
+С помощью комплексной структуры $J$ можно переходить от старой геометрии к новой и, почти всегда, наоборот:
+
+\be (G, B) \xleftrightarrow{J} (\tikz[baseline]{
+            \node[fill=purple!20,anchor=base] (t1)
+            {$g$};}, \tikz[baseline]{
+            \node[fill=orange!20,anchor=base] (t1)
+            {$\mu$};}, \tikz[baseline]{
+            \node[fill=green!20,anchor=base] (t1)
+            {$\bar \mu$};}, \tikz[baseline]{
+            \node[fill=cyan!20,anchor=base] (t1)
+            {$b$};}).
+            \ee
+
+
+Поговорим про теорию $$S = \int\limits_{\Sigma} P_i \bar \partial X^i.$$ В ней есть поля размерности $(\bullet, 0)$. Это, конечно, функции $f(x) \in (0,0)$, но также и $(\operatorname{Vect} \oplus \Omega) \in (1,0)$ --- алгебра векторных полей, расширенная своими представлениями. Такие элементы образуют алгебру Ли, назовём её $L$.
+
+Новая геометрия лежит в $L \otimes \bar L$. Именно, произведём следующее несложное вычисление:
+
+$$(V \oplus \Omega^1) \otimes (\bar V \oplus \bar \Omega^1) = $$
+
+\begin{equation*}
+= \tikz[baseline]{
+            \node[fill=purple!20,anchor=base] (t1)
+            {$V \otimes \bar V$};}  \oplus \tikz[baseline]{
+            \node[fill=orange!20,anchor=base] (t1)
+            {$V \otimes \bar \Omega^1$};} \oplus \tikz[baseline]{
+            \node[fill=green!20,anchor=base] (t1)
+            {$\Omega^1 \otimes \bar V$};} \oplus \tikz[baseline]{
+            \node[fill=cyan!20,anchor=base] (t1)
+            {$\Omega^1 \otimes \bar \Omega^1$};}.
+\end{equation*}
+
+Как уже стало понятно из боевой раскраски, $g \in V \otimes \bar V$, $\mu \in V \otimes \bar \Omega^1$, $\bar \mu \in \Omega^1 \otimes \bar V$, $b \in \Omega^1 \otimes \bar \Omega^1$.
+
+Новая геометрия <<чуть>> больше старой:
+
+\begin{center}
+\begin{tikzpicture}
+
+
+	\filldraw[fill=blue!70!white, thick] (0,1) ellipse (1cm and 0.2cm); % top ellipse
+	\filldraw[fill=orange!70!white, thick] (0,0) ellipse (1.4cm and 0.28cm); % bottom ellipse
+
+\draw[dashed,thick,color=gray] (0,0) ellipse (1cm and 0.2cm); % bottom ellipse
+
+\draw[dashed,thick,color=gray] (1.0,1) -- (1.0,0);
+\draw[dashed,thick,color=gray] (-1.0,1) -- (-1.0,0);
+
+\begin{scope}[decoration={amplitude=.4mm,
+        segment length=2mm,post length=1mm}]
+
+      \draw[decorate,orange,thick] (1.45,0) -- ++(5:3);
+      \draw[decorate,blue,thick] (1.05,1) -- ++(5:4);
+    \end{scope}
+    
+      \draw (1.45,0) ++(5:3) node[right] {\footnotesize new geometry};
+  \draw (1.05,1) ++(5:4) node[right] {\footnotesize old geometry};
+
+\end{tikzpicture}
+\end{center}
+
+Например, в старой геометрии годилась только Риччи-плоская метрика.
+
+Новая геометрия существует на 0-мерных схемах. (А 0-мерные схемы --- это по разным причинам хорошо.)
+
+
+
+\footnotesize{}
+
+Говоря <<схема>>, мы, в первую очередь, держим в уме следующий пример:
+
+$$\mathbb{C}[x_1, ..., x_n] / I_{F(x)}.$$
+
+Посредством резольвенты Кошуля это эквивалентно $\mathbb{C}[x_1, ..., x_n, \theta]$ с дифференциалом $Q = F \frac{\partial}{\partial \theta}.$
+
+
+\normalsize{}
+
+
+Пространство является гомологическим многообразием с гомологическим векторным полем. (Гомологическое векторное поле --- такое векторное поле $Q = v^i (x) \frac{\partial}{\partial x^i}$, что $Q^2 = 0$.) Для вещественно двумерного многообразия с комплексной структурой условие гомологичности векторного поля означает интегрируемость структуры. Деформация многообразия --- это деформация гомологического векторного поля.\que{Тут где-то ещё мимо проходили обобщённые деформации комплексных структур по Баранникову---Концевичу, но, где конкретно, я не понимаю.}
+
+Традиционного пространства в CFT нет.
+
+Пусть есть семейство CFT$_t$. Пусть, когда $t \to t_0$, некоторая группа полей неожиданно приобретает размерность 0.
+
+Назовём эти поля $\tilde \ph$. У них есть операторное разложение
+
+$$\tilde \ph_a (t) \tilde \ph_b (0) = c_{ab}^c (z,t) \tilde \ph_c + ...$$
+
+Мы видим, что пространство возникает алгебраически. Возникает как аффинная схема (<<по Гротендику>>), а не как набор дисков, склеенных между собой.
+
+
+Классическая физика и связанная с ней дифференциальная геометрия умерли. Фейнман как великий контрреволюционер.
+
+Пусть $\gamma \in L \otimes \bar L, a \in L, \bar a \in \bar L$. Определим скобку $[[,]]$: $$[[a \otimes \bar a, b \otimes \bar b]] := [a, b]_L \otimes [\bar a, \bar b]_{\bar L}$$
+
+Уравнение струнной гравитации, предположительно, выглядит так:
+
+\be (d+Q) (\gamma) + [[\gamma, \gamma]] + \mathcal{O}(\gamma^3) = 0 \ee
+
+$\gamma \in (g, \mu, \bar \mu, b)$, так что это действительно уравнение струнной гравитации (струнной --- потому что с полем Калба---Рамона $b$, гравитации --- потому что с метрикой). У этого уравнения есть решения на схемах, которые можно изучать.
+
+То есть, по-видимому, уравнения струнной гравитации имеют вид уравнения Маурера---Картана.
+
+Не так же ли выглядят уравнения М-теории? Этот вопрос, естественно, открыт.
+
+Изучение этого уравнения и его симметрий --- это и есть более-менее изучение струнной геометрии пространства-времени.
+
+
+\bigskip
+\bigskip
+
+
+ \end{document}
